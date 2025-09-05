@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Tab on Furniture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body class="bg-gray-50">
+    <div th:replace="~{nav/navbar :: navbar}"></div>
+
+    <div class="pt-16">
+        <div class="max-w-6xl mx-auto px-4 py-10">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-3xl font-bold text-gray-900">My Profile</h1>
+            <div class="text-sm text-gray-500" th:if="${user != null}" th:text="'Member since ' + ${#temporals.format(user.createdAt, 'MMM yyyy')}">Member since</div>
+        </div>
+
+        <!-- Alerts -->
+        <div th:if="${successMessage}" class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded">
+            <i class="fas fa-check-circle mr-2"></i><span th:text="${successMessage}">Success</span>
+        </div>
+        <div th:if="${errorMessage}" class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <i class="fas fa-triangle-exclamation mr-2"></i><span th:text="${errorMessage}">Error</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Sidebar Card -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <img id="profileImgPreview" th:if="${user != null and user.profileImageUrl != null}" th:src="${user.profileImageUrl}" alt="Profile" class="w-20 h-20 rounded-full object-cover border-2 border-purple-200">
+                        <div id="profileImgPlaceholder" class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-500" th:if="${user == null or user.profileImageUrl == null}">
+                            <i class="fas fa-user text-2xl"></i>
+                        </div>
+                        <label for="profileImageInput" class="absolute -bottom-1 -right-1 bg-white border border-gray-200 rounded-full p-2 shadow cursor-pointer hover:bg-purple-50">
+                            <i class="fas fa-camera text-purple-600"></i>
+                        </label>
+                    </div>
+                    <div>
+                        <div class="text-lg font-semibold" th:text="${user != null ? user.username : 'Guest'}">User</div>
+                        <div class="text-sm text-gray-600" th:text="${user != null ? user.email : ''}">user@example.com</div>
+                    </div>
+                </div>
+
+                <!-- Upload profile image -->
+                <form id="profileUploadForm" class="mt-4" th:action="@{/profile/upload-image}" method="post" enctype="multipart/form-data">
+                    <input id="profileImageInput" type="file" name="image" accept="image/*" class="hidden" required>
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-500">PNG, JPG up to 2MB</div>
+                        <button id="uploadBtn" type="submit" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Upload</button>
+                    </div>
+                </form>
+
+                <div class="mt-6 space-y-3">
+                    <a href="/orders" class="block text-purple-600 hover:text-purple-700"><i class="fas fa-box mr-2"></i>Order History</a>
+                    <a href="/contacts/my-contacts" class="block text-gray-700 hover:text-purple-600"><i class="fas fa-envelope mr-2"></i>My Contacts</a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Edit Profile Card -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Edit Details</h2>
+                    <div class="mt-2 flex justify-end">
+                        <button id="openEditNameModal" class="bg-purple-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-purple-700" type="button">Edit Name</button>
+                    </div>
+                </div>
+
+                <!-- Change Password Card -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-2">Change Password</h2>
+                    <p class="text-sm text-gray-600 mb-4">For your security, use a strong and unique password.</p>
+                    <div class="mt-2 flex justify-end">
+                        <button id="openChangePasswordModal" class="bg-gray-900 text-white px-5 py-2.5 rounded-lg shadow hover:bg-black" type="button">Update Password</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{nav/footer :: footer}"></div>
+    
+    <!-- Edit Name Modal -->
+    <div id="editNameModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-lg font-semibold">Edit Name</h3>
+                <button id="closeEditNameModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form th:action="@{/profile/update}" method="post" class="px-6 py-5">
+                <div class="mb-4">
+                    <label class="block text-sm text-gray-700 mb-1">Username</label>
+                    <input id="modalUsernameInput" class="w-full border border-gray-300 focus:border-purple-400 focus:ring-purple-400 rounded px-3 py-2" type="text" name="username" th:value="${user != null ? user.username : ''}" required>
+                </div>
+                <!-- keep email unchanged -->
+                <input type="hidden" name="email" th:value="${user != null ? user.email : ''}">
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancelEditName" class="px-4 py-2 rounded border border-gray-300 text-gray-700">Cancel</button>
+                    <button type="submit" class="px-4 py-2 rounded bg-purple-600 text-white hover:bg-purple-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-4">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-lg font-semibold">Update Password</h3>
+                <button id="closeChangePasswordModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form th:action="@{/profile/update-password}" method="post" class="px-6 py-5">
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="relative">
+                        <input id="currentPwdInput" class="w-full border border-gray-300 focus:border-purple-400 focus:ring-purple-400 rounded px-3 py-2 pr-10" type="password" name="currentPassword" placeholder="Current password" required>
+                        <button type="button" class="absolute inset-y-0 right-3 text-gray-500 hover:text-gray-700 toggle-visibility" data-target="currentPwdInput" aria-label="Toggle password visibility"><i class="fas fa-eye-slash"></i></button>
+                    </div>
+                    <div class="relative">
+                        <input id="newPwdInput" class="w-full border border-gray-300 focus:border-purple-400 focus:ring-purple-400 rounded px-3 py-2 pr-10" type="password" name="newPassword" placeholder="New password" required>
+                        <button type="button" class="absolute inset-y-0 right-3 text-gray-500 hover:text-gray-700 toggle-visibility" data-target="newPwdInput" aria-label="Toggle password visibility"><i class="fas fa-eye-slash"></i></button>
+                    </div>
+                    <div class="relative">
+                        <input id="confirmPwdInput" class="w-full border border-gray-300 focus:border-purple-400 focus:ring-purple-400 rounded px-3 py-2 pr-10" type="password" name="confirmPassword" placeholder="Confirm new password" required>
+                        <button type="button" class="absolute inset-y-0 right-3 text-gray-500 hover:text-gray-700 toggle-visibility" data-target="confirmPwdInput" aria-label="Toggle password visibility"><i class="fas fa-eye-slash"></i></button>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" id="cancelChangePassword" class="px-4 py-2 rounded border border-gray-300 text-gray-700">Cancel</button>
+                    <button type="submit" class="px-4 py-2 rounded bg-gray-900 text-white hover:bg-black">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Preview selected profile image before upload
+        const fileInput = document.getElementById('profileImageInput');
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                const file = this.files && this.files[0];
+                if (!file) return;
+                const url = URL.createObjectURL(file);
+                const img = document.getElementById('profileImgPreview');
+                const placeholder = document.getElementById('profileImgPlaceholder');
+                if (img) {
+                    img.src = url;
+                }
+                if (placeholder) {
+                    placeholder.style.display = 'none';
+                }
+            });
+        }
+
+        // Edit name modal logic
+        // Edit name modal logic
+        const openNameBtn = document.getElementById('openEditNameModal');
+        const nameModal = document.getElementById('editNameModal');
+        const closeNameBtn = document.getElementById('closeEditNameModal');
+        const cancelNameBtn = document.getElementById('cancelEditName');
+        function openNameModal() { nameModal.classList.remove('hidden'); }
+        function closeNameModal() { nameModal.classList.add('hidden'); }
+        if (openNameBtn) openNameBtn.addEventListener('click', openNameModal);
+        if (closeNameBtn) closeNameBtn.addEventListener('click', closeNameModal);
+        if (cancelNameBtn) cancelNameBtn.addEventListener('click', closeNameModal);
+
+        // Change password modal logic
+        const openPwdBtn = document.getElementById('openChangePasswordModal');
+        const pwdModal = document.getElementById('changePasswordModal');
+        const closePwdBtn = document.getElementById('closeChangePasswordModal');
+        const cancelPwdBtn = document.getElementById('cancelChangePassword');
+        function openPwdModal() { pwdModal.classList.remove('hidden'); }
+        function closePwdModal() { pwdModal.classList.add('hidden'); }
+        if (openPwdBtn) openPwdBtn.addEventListener('click', openPwdModal);
+        if (closePwdBtn) closePwdBtn.addEventListener('click', closePwdModal);
+        if (cancelPwdBtn) cancelPwdBtn.addEventListener('click', closePwdModal);
+
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeNameModal(); closePwdModal(); }});
+
+        // Password visibility toggles
+        const toggleButtons = document.querySelectorAll('.toggle-visibility');
+        toggleButtons.forEach((btn) => {
+            btn.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                if (!input) return;
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                const icon = this.querySelector('i');
+                if (icon) {
+                    // When showing text, show the 'eye' icon; when hidden, show 'eye-slash'
+                    if (isPassword) {
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    } else {
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+

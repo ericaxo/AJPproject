@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders Management - Tab on Furniture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        
+        <div th:replace="~{nav/adminSidebar :: adminSidebar}"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-x-hidden overflow-y-auto">
+            
+            <div th:replace="~{nav/adminNavbar :: adminNavbar}"></div>
+
+            <!-- Orders Content -->
+            <div class="p-6">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Order Management</h1>
+                        <p class="text-gray-600">Manage and track customer orders</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors">
+                            <i class="fas fa-list mr-2"></i>All Orders
+                        </button>
+                        <button class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white text-sm font-medium rounded-lg hover:bg-yellow-600 transition-colors">
+                            <i class="fas fa-clock mr-2"></i>Pending Orders
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters and Search -->
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" placeholder="Search orders..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <select class="border rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <select class="border rounded-lg px-4 py-2 focus:outline-none focus:border-purple-500">
+                            <option value="">Date Range</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                            <i class="fas fa-download mr-2"></i>Export
+                        </button>
+                        <button class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                            <i class="fas fa-print mr-2"></i>Print
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="bg-white rounded-lg shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Amount</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="text-sm font-medium text-gray-900">#1</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">saurav Shrestha</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">$29.99</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">
+                                            PENDING
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">
+                                            PENDING
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">Aug 01, 2025 21:32</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex space-x-2">
+                                            <button class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors">
+                                                <i class="fas fa-eye mr-1"></i>View
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Add more order rows as needed -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="px-6 py-4 flex items-center justify-between border-t">
+                        <div class="text-sm text-gray-500">
+                            Showing 1 to 10 of 100 entries
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 border rounded hover:bg-gray-50">Previous</button>
+                            <button class="px-3 py-1 border rounded bg-purple-600 text-white">1</button>
+                            <button class="px-3 py-1 border rounded hover:bg-gray-50">2</button>
+                            <button class="px-3 py-1 border rounded hover:bg-gray-50">3</button>
+                            <button class="px-3 py-1 border rounded hover:bg-gray-50">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Order Details Modal -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 hidden" id="orderModal">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl">
+                    <div class="p-6 border-b flex justify-between items-center">
+                        <h2 class="text-xl font-semibold">Order Details #ORD-001</h2>
+                        <button class="text-gray-500 hover:text-gray-600" onclick="closeOrderDetails()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <h3 class="text-lg font-semibold mb-4">Customer Information</h3>
+                                <div class="space-y-2">
+                                    <p><span class="font-medium">Name:</span> John Doe</p>
+                                    <p><span class="font-medium">Email:</span> john@example.com</p>
+                                    <p><span class="font-medium">Phone:</span> (555) 123-4567</p>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold mb-4">Shipping Address</h3>
+                                <div class="space-y-2">
+                                    <p>123 Main Street</p>
+                                    <p>Apt 4B</p>
+                                    <p>New York, NY 10001</p>
+                                    <p>United States</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-4">Order Items</h3>
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-2">Premium Cotton T-Shirt</td>
+                                        <td class="px-4 py-2">2</td>
+                                        <td class="px-4 py-2">$29.99</td>
+                                        <td class="px-4 py-2">$59.98</td>
+                                    </tr>
+                                    <!-- Add more items as needed -->
+                                </tbody>
+                                <tfoot class="bg-gray-50">
+                                    <tr>
+                                        <td colspan="3" class="px-4 py-2 text-right font-medium">Subtotal:</td>
+                                        <td class="px-4 py-2">$59.98</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="px-4 py-2 text-right font-medium">Shipping:</td>
+                                        <td class="px-4 py-2">$5.99</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="px-4 py-2 text-right font-medium">Tax:</td>
+                                        <td class="px-4 py-2">$6.60</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="px-4 py-2 text-right font-medium">Total:</td>
+                                        <td class="px-4 py-2 font-bold">$72.57</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-lg font-semibold mb-4">Order Status</h3>
+                                <select class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
+                                    <option value="pending">Pending</option>
+                                    <option value="processing" selected>Processing</option>
+                                    <option value="shipped">Shipped</option>
+                                    <option value="delivered">Delivered</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold mb-4">Payment Information</h3>
+                                <div class="space-y-2">
+                                    <p><span class="font-medium">Method:</span> Credit Card</p>
+                                    <p><span class="font-medium">Card:</span> **** **** **** 1234</p>
+                                    <p><span class="font-medium">Status:</span> Paid</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 border-t flex justify-end space-x-3">
+                        <button class="px-4 py-2 border rounded-lg hover:bg-gray-50" onclick="closeOrderDetails()">Close</button>
+                        <button class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Update Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showOrderDetails() {
+            document.getElementById('orderModal').classList.remove('hidden');
+        }
+
+        function closeOrderDetails() {
+            document.getElementById('orderModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html> 

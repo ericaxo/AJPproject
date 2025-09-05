@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name} + ' - Tab On Furniture'">Product Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .dropdown-menu {
+            display: none;
+            transition: all 0.3s ease;
+        }
+        .user-dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        
+
+    </style>
+</head>
+<body class="bg-gray-50" th:data-current-user="${user != null ? user.username : ''}">
+    
+	<div th:replace="~{nav/navbar :: navbar}"></div>
+
+    <!-- Product Details Section -->
+    <div class="pt-20 max-w-7xl mx-auto px-4 py-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="/products" class="text-gray-600 hover:text-purple-600">Products</a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <span class="mx-2 text-gray-400">/</span>
+                        <a th:href="@{/products(category=${product.category})}" th:text="${product.category}" class="text-gray-600 hover:text-purple-600">Category</a>
+                    </div>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <span class="mx-2 text-gray-400">/</span>
+                        <span class="text-gray-500" th:text="${product.name}">Product Name</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Product Images -->
+            <div class="w-full md:w-1/2">
+                <div class="mb-4">
+                    <img th:if="${product.imageUrl != null and !product.imageUrl.isEmpty()}"
+                         th:src="${product.imageUrl}"
+                         class="w-full rounded-lg object-cover" style="height: 500px;"
+                         th:alt="${product.name}"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="flex items-center justify-center w-full rounded-lg bg-gray-100 text-gray-400" style="height: 500px; display: none;">
+                        <i class="fas fa-image fa-4x mb-3"></i>
+                        <div class="h5">No Image Available</div>
+                    </div>
+                    <img th:if="${product.imageUrl == null or product.imageUrl.isEmpty()}"
+                         src="/images/placeholders/placeholder-600x500.jpg"
+                         class="w-full rounded-lg object-cover" style="height: 500px;"
+                         th:alt="${product.name}">
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="w-full md:w-1/2">
+                <h1 class="text-3xl font-bold text-gray-900 mb-4" th:text="${product.name}">Product Name</h1>
+                <!-- Sustainability Score -->
+                
+                <p class="text-2xl text-gray-900 mb-6">Rs <span th:text="${product.price}">29.99</span></p>
+                <div class="mb-6">
+                    <h2 class="text-lg font-semibold mb-2">Description</h2>
+                    <p class="text-gray-600" th:text="${product.description}">Product description goes here...</p>
+                </div>
+                <div class="mb-6">
+                    <h2 class="text-lg font-semibold mb-2">Attributes</h2>
+                    <div class="grid grid-cols-2 gap-2 text-gray-700">
+                        <div><strong>Category:</strong> <span th:text="${product.category}">Living Room</span></div>
+                        <div><strong>Color / Finish:</strong> <span th:text="${product.color}">Walnut</span></div>
+                        <div><strong>Dimensions / Size:</strong> <span th:text="${product.dimensions}">2-Seater</span></div>
+                        <div><strong>Material:</strong> <span th:text="${product.material}">Solid Wood</span></div>
+                    </div>
+                </div>
+                <!-- Stock Status -->
+                <div class="mb-3">
+                    <div th:if="${product.stockQuantity > 0}" class="text-green-600 font-semibold">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        In Stock (<span th:text="${product.stockQuantity}">10</span> available)
+                    </div>
+                    <div th:if="${product.stockQuantity <= 0}" class="text-red-600 font-semibold">
+                        <i class="fas fa-times-circle mr-1"></i>
+                        Out of Stock
+                    </div>
+                </div>
+                <!-- Add to Cart Form -->
+                <form th:action="@{/cart/add}" method="post" class="mb-6 flex items-center space-x-4">
+                    <input type="hidden" name="productId" th:value="${product.id}">
+                    <div>
+                        <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity:</label>
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" th:max="${product.stockQuantity}"
+                               class="w-20 px-2 py-1 border rounded-lg focus:outline-none focus:border-purple-500">
+                    </div>
+                    <button type="submit"
+                            class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700"
+                            th:disabled="${product.stockQuantity <= 0}">
+                        <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                    </button>
+                </form>
+                <!-- Additional Actions -->
+                <div class="flex gap-2 mb-6">
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Notification -->
+        <div id="cartNotification" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span id="cartNotificationText">Product added to cart!</span>
+            </div>
+        </div>
+
+        <!-- Product Details Tabs -->
+        <div class="mt-12">
+            <div class="border-b">
+                <nav class="flex space-x-8">
+                    <button class="border-b-2 border-purple-600 py-4 px-1 text-purple-600" data-tab="description">Description</button>
+                    <button class="border-b-2 border-transparent py-4 px-1 text-gray-500 hover:text-gray-700 cursor-pointer" data-tab="reviews" style="cursor: pointer;">Reviews <i class="fas fa-comments ml-1"></i></button>
+                </nav>
+            </div>
+            
+            <!-- Description Tab -->
+            <div id="description-tab" class="py-8">
+                <h2 class="text-xl font-bold mb-4">Product Description</h2>
+                <p class="text-gray-600 mb-4" th:text="${product.description}">Detailed product description...</p>
+                <ul class="list-disc list-inside text-gray-600 space-y-2">
+                    <li><strong>Category:</strong> <span th:text="${product.category}">Living Room</span></li>
+                    <li><strong>Dimensions / Size:</strong> <span th:text="${product.dimensions}">2-Seater</span></li>
+                    <li><strong>Color / Finish:</strong> <span th:text="${product.color}">Walnut</span></li>
+                    <li><strong>Material:</strong> <span th:text="${product.material}">Solid Wood</span></li>
+                    
+                </ul>
+            </div>
+            
+            <!-- Reviews Tab -->
+            <div id="reviews-tab" class="py-8 hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold">Customer Reviews</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center">
+                            <span class="text-2xl font-bold text-yellow-500" id="average-rating">0.0</span>
+                            <div class="ml-2">
+                                <div class="flex text-yellow-400" id="average-stars">
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <span class="text-sm text-gray-600" id="review-count">(0 reviews)</span>
+                            </div>
+                        </div>
+                        <button id="write-review-btn" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                            <i class="fas fa-pen mr-2"></i>Write a Review
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Review Form (Hidden by default) -->
+                <div id="review-form" class="bg-gray-50 p-6 rounded-lg mb-6 hidden">
+                    <h3 class="text-lg font-semibold mb-4">Write Your Review</h3>
+                    <form id="add-review-form" method="post" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                            <div class="flex space-x-2">
+                                <input type="hidden" name="rating" id="rating-input" value="">
+                                <label class="text-2xl text-gray-300 hover:text-yellow-400 cursor-pointer star-rating" data-rating="5">★</label>
+                                <label class="text-2xl text-gray-300 hover:text-yellow-400 cursor-pointer star-rating" data-rating="4">★</label>
+                                <label class="text-2xl text-gray-300 hover:text-yellow-400 cursor-pointer star-rating" data-rating="3">★</label>
+                                <label class="text-2xl text-gray-300 hover:text-yellow-400 cursor-pointer star-rating" data-rating="2">★</label>
+                                <label class="text-2xl text-gray-300 hover:text-yellow-400 cursor-pointer star-rating" data-rating="1">★</label>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="review-content" class="block text-sm font-medium text-gray-700 mb-2">Your Review</label>
+                            <textarea id="review-content" name="content" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="Share your experience with this product..."></textarea>
+                        </div>
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" id="cancel-review" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Submit Review</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Reviews List -->
+                <div id="reviews-list" class="space-y-6">
+                    <!-- Reviews will be loaded here dynamically -->
+                </div>
+                
+                <!-- No Reviews Message -->
+                <div id="no-reviews" class="text-center py-8 text-gray-500">
+                    <i class="fas fa-comments text-4xl mb-4"></i>
+                    <p>No reviews yet. Be the first to review this product!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<div th:replace="~{nav/footer :: footer}"></div>
+	
+	<!-- Set current user for JavaScript -->
+	<script th:inline="javascript">
+		window.currentUser = /*[[${user != null ? user.username : ''}]]*/ '';
+	</script>
+	
+	<script>
+		// Cart notification functionality
+		function showCartNotification(message) {
+			const notification = document.getElementById('cartNotification');
+			const notificationText = document.getElementById('cartNotificationText');
+			
+			notificationText.textContent = message;
+			notification.classList.remove('translate-x-full');
+			
+			// Hide notification after 3 seconds
+			setTimeout(() => {
+				notification.classList.add('translate-x-full');
+			}, 3000);
+		}
+		
+		// Handle cart form submission
+		document.addEventListener('DOMContentLoaded', function() {
+			const cartForm = document.querySelector('form[method="post"]');
+			
+			if (cartForm) {
+				cartForm.addEventListener('submit', function(e) {
+					e.preventDefault();
+					
+					// Check if user is logged in by looking for user info in navbar
+					const userInfo = document.querySelector('.user-dropdown');
+					if (!userInfo) {
+						// User is not logged in, show login prompt
+						showCartNotification('Please login to add items to cart!');
+						setTimeout(() => {
+							window.location.href = '/auth/login';
+						}, 1500);
+						return;
+					}
+					
+					const formData = new FormData(this);
+					const productId = formData.get('productId');
+					const quantity = formData.get('quantity');
+					
+					fetch('/cart/add-ajax', {
+						method: 'POST',
+						body: formData
+					})
+					.then(response => response.json())
+					.then(data => {
+						if (data.success) {
+							// Successfully added to cart, redirect to cart page
+							window.location.href = data.redirectUrl;
+						} else {
+							// Show error message
+							showCartNotification(data.message);
+							// If login required, redirect after showing message
+							if (data.redirectUrl) {
+								setTimeout(() => {
+									window.location.href = data.redirectUrl;
+								}, 1500);
+							}
+						}
+					})
+					.catch(error => {
+						console.error('Error:', error);
+						showCartNotification('Error adding product to cart!');
+					});
+				});
+			}
+		});
+		
+		// Update cart count in navbar
+		function updateCartCount() {
+			fetch('/cart/count')
+				.then(response => response.json())
+				.then(data => {
+					const cartCount = document.querySelector('.cart-count');
+					if (cartCount) {
+						cartCount.textContent = data.count;
+					}
+				})
+				.catch(error => console.error('Error updating cart count:', error));
+		}
+		
+		// Tab functionality
+		function showTab(tabName, event) {
+			console.log('showTab called with:', tabName);
+			
+			// Hide all tabs
+			document.getElementById('description-tab').classList.add('hidden');
+			document.getElementById('reviews-tab').classList.add('hidden');
+			
+			// Remove active state from all buttons
+			document.querySelectorAll('nav button').forEach(btn => {
+				btn.classList.remove('border-purple-600', 'text-purple-600');
+				btn.classList.add('border-transparent', 'text-gray-500');
+			});
+			
+			// Show selected tab
+			const selectedTab = document.getElementById(tabName + '-tab');
+			if (selectedTab) {
+				selectedTab.classList.remove('hidden');
+				console.log('Showing tab:', tabName + '-tab');
+			} else {
+				console.error('Tab not found:', tabName + '-tab');
+			}
+			
+			// Add active state to selected button
+			event.target.classList.remove('border-transparent', 'text-gray-500');
+			event.target.classList.add('border-purple-600', 'text-purple-600');
+			
+			// Load reviews if reviews tab is selected
+			if (tabName === 'reviews') {
+				console.log('Loading reviews...');
+				loadReviews();
+			}
+		}
+		
+		// Star rating functionality
+		function initializeStarRating() {
+			const stars = document.querySelectorAll('.star-rating');
+			const ratingInput = document.getElementById('rating-input');
+			
+			console.log('Initializing star rating...');
+			console.log('Found stars:', stars.length);
+			console.log('Found rating input:', ratingInput);
+			
+			// Reset all stars to gray initially
+			stars.forEach(star => {
+				star.classList.remove('text-yellow-400');
+				star.classList.add('text-gray-300');
+			});
+			
+			// Reset rating input
+			if (ratingInput) {
+				ratingInput.value = '';
+			}
+			
+			// Add click event to each star
+			stars.forEach((star) => {
+				// Remove any existing event listeners
+				star.removeEventListener('click', star.clickHandler);
+				
+				// Create new click handler
+				star.clickHandler = function() {
+					const dataRating = parseInt(this.getAttribute('data-rating'));
+					// Convert data-rating to actual rating: 1->5, 2->4, 3->3, 4->2, 5->1
+					const rating = 6 - dataRating;
+					console.log('=== STAR CLICKED ===');
+					console.log('Clicked star data-rating:', dataRating);
+					console.log('Converted to actual rating:', rating);
+					console.log('Clicked star element:', this);
+					
+					// Clear all stars first
+					stars.forEach(s => {
+						s.classList.remove('text-yellow-400');
+						s.classList.add('text-gray-300');
+					});
+					
+					// Fill stars from left to right based on converted rating
+					stars.forEach((s, index) => {
+						const starRating = parseInt(s.getAttribute('data-rating'));
+						console.log(`Checking star ${starRating} (index ${index}) against converted rating ${rating}`);
+						
+						// Simple logic: fill stars from left to right based on rating
+						// Stars are ordered: 5,4,3,2,1 (left to right)
+						// So index 0 = star 5, index 1 = star 4, etc.
+						if (index < rating) {
+							s.classList.remove('text-gray-300');
+							s.classList.add('text-yellow-400');
+							console.log(`Star ${starRating} (index ${index}) -> YELLOW`);
+						} else {
+							s.classList.remove('text-yellow-400');
+							s.classList.add('text-gray-300');
+							console.log(`Star ${starRating} (index ${index}) -> GRAY`);
+						}
+					});
+					
+					// Set the rating value in hidden input
+					if (ratingInput) {
+						ratingInput.value = rating;
+						console.log('Rating input set to:', rating);
+					}
+					console.log('=== END STAR CLICK ===');
+				};
+				
+				// Add the event listener
+				star.addEventListener('click', star.clickHandler);
+			});
+			
+			// Reset stars when form is reset
+			document.getElementById('add-review-form').addEventListener('reset', () => {
+				setTimeout(() => {
+					initializeStarRating();
+				}, 100);
+			});
+		}
+		
+		// Load reviews
+		function loadReviews() {
+			console.log('loadReviews function called');
+			const productId = window.location.pathname.split('/').pop();
+			console.log('Product ID:', productId);
+			
+			fetch(`/products/${productId}/reviews`)
+				.then(response => {
+					console.log('Response status:', response.status);
+					return response.json();
+				})
+				.then(data => {
+					console.log('Reviews data:', data);
+					if (data.success) {
+						updateReviewStats(data.averageRating, data.reviewCount);
+						displayReviews(data.reviews);
+					} else {
+						console.error('Error loading reviews:', data.message);
+					}
+				})
+				.catch(error => {
+					console.error('Error loading reviews:', error);
+				});
+		}
+		
+		// Update review statistics
+		function updateReviewStats(averageRating, reviewCount) {
+			document.getElementById('average-rating').textContent = averageRating.toFixed(1);
+			document.getElementById('review-count').textContent = `(${reviewCount} reviews)`;
+			
+			// Update star display
+			const stars = document.getElementById('average-stars').children;
+			const fullStars = Math.floor(averageRating);
+			const hasHalfStar = averageRating % 1 >= 0.5;
+			
+			for (let i = 0; i < stars.length; i++) {
+				if (i < fullStars) {
+					stars[i].className = 'fas fa-star text-yellow-400';
+				} else if (i === fullStars && hasHalfStar) {
+					stars[i].className = 'fas fa-star-half-alt text-yellow-400';
+				} else {
+					stars[i].className = 'far fa-star text-yellow-400';
+				}
+			}
+		}
+		
+		// Display reviews
+		function displayReviews(reviews) {
+			const reviewsList = document.getElementById('reviews-list');
+			const noReviews = document.getElementById('no-reviews');
+			
+			if (reviews.length === 0) {
+				reviewsList.innerHTML = '';
+				noReviews.classList.remove('hidden');
+				return;
+			}
+			
+			noReviews.classList.add('hidden');
+			
+			// Get current user from global variable
+			const currentUser = window.currentUser || '';
+			
+			reviewsList.innerHTML = reviews.map(review => {
+				// Check if current user is the review author
+				const isReviewAuthor = currentUser === review.author;
+				
+				return `
+				<div class="bg-white p-6 rounded-lg shadow-sm border" data-review-id="${review.id}">
+					<div class="flex justify-between items-start mb-4">
+						<div class="flex items-center space-x-3">
+							<img src="${review.authorProfileImage || '/images/logo.png'}" alt="${review.author}" class="w-10 h-10 rounded-full object-cover">
+							<div>
+								<div class="font-semibold text-gray-900">${review.author}</div>
+								<div class="flex text-yellow-400">
+									${generateStars(review.rating)}
+								</div>
+							</div>
+						</div>
+						<div class="flex items-center space-x-2">
+							<div class="text-sm text-gray-500">${formatDate(review.createdAt)}</div>
+							${isReviewAuthor ? `
+							<button onclick="deleteReview(${review.id})" 
+									class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors">
+								<i class="fas fa-trash text-sm"></i>
+							</button>
+							` : ''}
+						</div>
+					</div>
+					<div class="text-gray-700 mb-4">${review.content}</div>
+				</div>
+			`}).join('');
+		}
+		
+		// Generate star HTML
+		function generateStars(rating) {
+			let stars = '';
+			for (let i = 1; i <= 5; i++) {
+				if (i <= rating) {
+					stars += '<i class="fas fa-star"></i>';
+				} else {
+					stars += '<i class="far fa-star"></i>';
+				}
+			}
+			return stars;
+		}
+		
+		// Format date
+		function formatDate(dateString) {
+			const date = new Date(dateString);
+			return date.toLocaleDateString('en-US', { 
+				year: 'numeric', 
+				month: 'long', 
+				day: 'numeric' 
+			});
+		}
+		
+		// Review form functionality
+		function initializeReviewForm() {
+			const writeReviewBtn = document.getElementById('write-review-btn');
+			const reviewForm = document.getElementById('review-form');
+			const cancelReviewBtn = document.getElementById('cancel-review');
+			const addReviewForm = document.getElementById('add-review-form');
+			
+			writeReviewBtn.addEventListener('click', () => {
+				reviewForm.classList.remove('hidden');
+				writeReviewBtn.classList.add('hidden');
+				// Initialize star rating when form is shown
+				setTimeout(() => {
+					initializeStarRating();
+				}, 100);
+			});
+			
+			// Also initialize star rating when form is reset
+			addReviewForm.addEventListener('reset', () => {
+				setTimeout(() => {
+					initializeStarRating();
+				}, 100);
+			});
+			
+			cancelReviewBtn.addEventListener('click', () => {
+				reviewForm.classList.add('hidden');
+				writeReviewBtn.classList.remove('hidden');
+				addReviewForm.reset();
+			});
+			
+			addReviewForm.addEventListener('submit', (e) => {
+				e.preventDefault();
+				
+				const formData = new FormData(addReviewForm);
+				const productId = window.location.pathname.split('/').pop();
+				
+				// Get the rating value from hidden input
+				const ratingInput = document.getElementById('rating-input');
+				if (!ratingInput || !ratingInput.value) {
+					showCartNotification('Please select a rating by clicking on the stars');
+					return;
+				}
+				
+				// Debug: Check what rating is being sent
+				const rating = ratingInput.value;
+				console.log('Submitting review with rating:', rating);
+				console.log('Rating input value:', ratingInput.value);
+				
+				// Log all form data
+				console.log('All form data:');
+				for (let [key, value] of formData.entries()) {
+					console.log(`  ${key}: ${value}`);
+				}
+				
+				// Check if rating is selected
+				if (!rating) {
+					showCartNotification('Please select a rating');
+					return;
+				}
+				
+				console.log('Rating value being submitted:', rating);
+				
+				fetch(`/products/${productId}/review`, {
+					method: 'POST',
+					body: formData
+				})
+				.then(response => response.json())
+				.then(data => {
+					if (data.success) {
+						showCartNotification('Review submitted successfully!');
+						reviewForm.classList.add('hidden');
+						writeReviewBtn.classList.remove('hidden');
+						addReviewForm.reset();
+						loadReviews(); // Reload reviews
+					} else {
+						showCartNotification(data.message);
+					}
+				})
+				.catch(error => {
+					console.error('Error submitting review:', error);
+					showCartNotification('Error submitting review!');
+				});
+			});
+		}
+		
+		// Delete review
+		function deleteReview(reviewId) {
+			if (confirm('Are you sure you want to delete this review?')) {
+				fetch(`/products/review/${reviewId}/delete`, {
+					method: 'POST'
+				})
+				.then(response => response.json())
+				.then(data => {
+					if (data.success) {
+						showCartNotification('Review deleted successfully!');
+						loadReviews(); // Reload reviews
+					} else {
+						showCartNotification(data.message);
+					}
+				})
+				.catch(error => {
+					console.error('Error deleting review:', error);
+					showCartNotification('Error deleting review!');
+				});
+			}
+		}
+		
+
+		
+
+		
+		// Initialize review functionality
+		document.addEventListener('DOMContentLoaded', function() {
+			console.log('DOM loaded, initializing review functionality');
+			initializeStarRating();
+			initializeReviewForm();
+			initializeTabs();
+			
+
+			
+			// Get current user from server
+			fetch('/auth/current-user')
+				.then(response => response.json())
+				.then(data => {
+					if (data.success && data.user) {
+						window.currentUser = data.user.username;
+						console.log('Current user set:', window.currentUser);
+					}
+				})
+				.catch(error => {
+					console.log('No user logged in or error fetching user');
+				});
+		});
+		
+		// Initialize tab functionality
+		function initializeTabs() {
+			console.log('Initializing tabs...');
+			const tabButtons = document.querySelectorAll('nav button[data-tab]');
+			console.log('Found tab buttons:', tabButtons.length);
+			
+			tabButtons.forEach(button => {
+				button.addEventListener('click', function(e) {
+					const tabName = this.getAttribute('data-tab');
+					console.log('Tab clicked:', tabName);
+					showTab(tabName, e);
+				});
+			});
+		}
+		
+		// Update cart count in navbar
+		function updateCartCount() {
+			fetch('/cart/count')
+				.then(response => response.json())
+				.then(data => {
+					const cartBadge = document.querySelector('.fas.fa-shopping-cart').nextElementSibling;
+					if (cartBadge && data.count > 0) {
+						cartBadge.textContent = data.count;
+						cartBadge.classList.remove('hidden');
+					} else if (cartBadge && data.count === 0) {
+						cartBadge.classList.add('hidden');
+					}
+				})
+				.catch(error => console.error('Error updating cart count:', error));
+		}
+	</script>
+</body>
+</html>

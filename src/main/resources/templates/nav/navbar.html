@@ -1,0 +1,230 @@
+<div th:fragment="navbar">
+	<!-- Navigation -->
+	<nav class="bg-white shadow-lg fixed w-full z-10">
+		<div class="max-w-7xl mx-auto px-4">
+			<div class="flex justify-between items-center h-16">
+				<!-- Logo -->
+				<div class="flex-shrink-0">
+					<a href="/" class="flex items-center space-x-2">
+						<img src="/images/logo.png" alt="Tab on Furniture" class="h-10 w-10 rounded-full">
+						<span class="text-xl font-bold text-purple-600">Tab on Furniture</span>
+					</a>
+				</div>
+				
+				<!-- Navigation Links - Centered -->
+				<div class="hidden md:flex space-x-8 justify-center flex-1">
+					<a href="/" class="nav-link text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+					<a href="/products" class="nav-link text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Shop</a>
+					
+					<a href="/about" class="nav-link text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
+					<a href="/contact" class="nav-link text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Contact</a>
+				</div>
+				
+				<!-- User Section -->
+				<div class="flex items-center space-x-4">
+					<!-- Shopping Cart -->
+					<a th:if="${user != null}" href="/cart" class="text-gray-600 hover:text-purple-600 relative transition-colors">
+						<i class="fas fa-shopping-cart text-lg"></i>
+						<span th:if="${cartItemCount != null and cartItemCount > 0}" th:text="${cartItemCount}"
+							class="absolute -top-2 -right-2 bg-purple-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium">0</span>
+					</a>
+					
+					<!-- Show Login/Sign Up buttons when user is not logged in -->
+					<div th:if="${user == null}" class="flex items-center space-x-3">
+						<a href="/auth/login" class="text-gray-600 hover:text-purple-600 px-3 py-2 rounded-lg hover:bg-purple-50 transition-colors">
+							Login
+						</a>
+						<a href="/auth/signup" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+							Sign Up
+						</a>
+					</div>
+					
+					<!-- Show user dropdown when user is logged in -->
+					<div th:if="${user != null}" class="relative user-dropdown">
+						<div class="flex items-center space-x-2">
+							<span class="text-gray-700 font-medium text-sm" th:text="${#strings.capitalize(user.username)}">User</span>
+							<button id="userIconBtn" class="text-gray-600 hover:text-purple-600 p-2 rounded-full hover:bg-purple-50 transition-colors">
+								<img th:if="${user.profileImageUrl != null}" th:src="${user.profileImageUrl + '?v=' + #dates.createNow().time}" alt="Profile" class="w-8 h-8 rounded-full object-cover">
+								<i th:if="${user.profileImageUrl == null}" class="fas fa-user text-xl"></i>
+							</button>
+						</div>
+						<div id="userDropdownMenu"
+							class="dropdown-menu absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg py-2 z-50 hidden border border-gray-200">
+							<a href="/profile"
+								class="block px-4 py-2 text-gray-800 hover:bg-purple-50 hover:text-purple-600 transition-colors">
+								<i class="fas fa-user-circle mr-2"></i>Profile
+							</a>
+							<a href="/orders"
+								class="block px-4 py-2 text-gray-800 hover:bg-purple-50 hover:text-purple-600 transition-colors">
+								<i class="fas fa-history mr-2"></i>Order History
+							</a>
+							<a href="/contacts/my-contacts"
+								class="block px-4 py-2 text-gray-800 hover:bg-purple-50 hover:text-purple-600 transition-colors">
+								<i class="fas fa-envelope mr-2"></i>My Contacts
+							</a>
+							<div class="border-t border-gray-200 my-1"></div>
+							<a href="/auth/logout"
+								class="block px-4 py-2 text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors">
+								<i class="fas fa-sign-out-alt mr-2"></i>Logout
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</nav>
+	
+	<style>
+		/* Navbar styling */
+		nav {
+			backdrop-filter: blur(10px);
+			background-color: rgba(255, 255, 255, 0.95);
+		}
+		
+		/* Navigation links styling */
+		.nav-link {
+			position: relative;
+			font-weight: 500;
+		}
+		
+		.nav-link:hover {
+			color: #9333ea !important;
+		}
+		
+		.nav-link.active {
+			color: #9333ea !important;
+			font-weight: 600;
+		}
+		
+		/* Ensure dropdown is properly hidden by default */
+		.dropdown-menu.hidden {
+			display: none !important;
+			opacity: 0;
+			visibility: hidden;
+			transform: translateY(-10px);
+			transition: all 0.2s ease;
+		}
+		
+		.dropdown-menu:not(.hidden) {
+			display: block !important;
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+		}
+		
+		/* Visual feedback for active dropdown */
+		.user-dropdown.active .dropdown-menu {
+			display: block !important;
+		}
+		
+		/* Smooth transitions */
+		* {
+			transition: all 0.2s ease;
+		}
+	</style>
+	
+	<script>
+		// Highlight current page in navigation and setup user dropdown
+		(function() {
+			function initializeNavbar() {
+				// Highlight current page in navigation
+				const currentPath = window.location.pathname;
+				const navLinks = document.querySelectorAll('.nav-link');
+				
+				navLinks.forEach(link => {
+					const href = link.getAttribute('href');
+					if (href === currentPath || 
+						(currentPath === '/products' && href === '/products') ||
+						(currentPath === '/' && href === '/') ||
+						(currentPath.startsWith('/jobs') && href === '/jobs') ||
+						(currentPath.startsWith('/blog') && href === '/blog/feed')) {
+						link.classList.remove('text-gray-700');
+						link.classList.add('text-purple-600', 'font-semibold');
+					}
+				});
+
+				// User dropdown functionality
+				const userIconBtn = document.getElementById('userIconBtn');
+				const userDropdownMenu = document.getElementById('userDropdownMenu');
+				const userDropdown = document.querySelector('.user-dropdown');
+				
+				if (userIconBtn && userDropdownMenu) {
+					console.log('User dropdown elements found, setting up event listeners');
+					
+					// Ensure dropdown is hidden by default
+					userDropdownMenu.classList.add('hidden');
+					
+					// Remove any existing event listeners to prevent duplicates
+					userIconBtn.removeEventListener('click', toggleDropdown);
+					document.removeEventListener('click', closeDropdown);
+					document.removeEventListener('keydown', handleEscape);
+					
+					// Toggle dropdown only when clicking on the user icon
+					userIconBtn.addEventListener('click', toggleDropdown);
+
+					// Close dropdown when clicking outside
+					document.addEventListener('click', closeDropdown);
+
+					// Close dropdown when pressing Escape key
+					document.addEventListener('keydown', handleEscape);
+				} else {
+					console.log('User dropdown elements not found');
+				}
+			}
+
+			function toggleDropdown(e) {
+				e.stopPropagation();
+				const userDropdownMenu = document.getElementById('userDropdownMenu');
+				const userDropdown = document.querySelector('.user-dropdown');
+				
+				if (userDropdownMenu) {
+					const isHidden = userDropdownMenu.classList.contains('hidden');
+					
+					if (isHidden) {
+						// Show dropdown
+						userDropdownMenu.classList.remove('hidden');
+						userDropdown.classList.add('active');
+						console.log('Dropdown opened');
+					} else {
+						// Hide dropdown
+						userDropdownMenu.classList.add('hidden');
+						userDropdown.classList.remove('active');
+						console.log('Dropdown closed');
+					}
+				}
+			}
+
+			function closeDropdown(e) {
+				const userIconBtn = document.getElementById('userIconBtn');
+				const userDropdownMenu = document.getElementById('userDropdownMenu');
+				const userDropdown = document.querySelector('.user-dropdown');
+				
+				if (userIconBtn && userDropdownMenu && !userIconBtn.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+					userDropdownMenu.classList.add('hidden');
+					userDropdown.classList.remove('active');
+					console.log('Dropdown closed by outside click');
+				}
+			}
+
+			function handleEscape(e) {
+				if (e.key === 'Escape') {
+					const userDropdownMenu = document.getElementById('userDropdownMenu');
+					const userDropdown = document.querySelector('.user-dropdown');
+					
+					if (userDropdownMenu) {
+						userDropdownMenu.classList.add('hidden');
+						userDropdown.classList.remove('active');
+						console.log('Dropdown closed by Escape key');
+					}
+				}
+			}
+
+			// Initialize when DOM is ready
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', initializeNavbar);
+			} else {
+				initializeNavbar();
+			}
+		})();
+	</script>
+</div>

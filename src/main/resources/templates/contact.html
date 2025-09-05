@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Tab on Furniture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <div th:replace="~{nav/navbar :: navbar}"></div>
+
+    <!-- Contact Section -->
+    <div class="pt-20 max-w-7xl mx-auto px-4 py-12">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">Have a question or need assistance? We're here to help! Fill out the form below and we'll get back to you as soon as possible.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <!-- Contact Form -->
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <!-- Success Message -->
+                <div th:if="${successMessage}" class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                    <span th:text="${successMessage}"></span>
+                </div>
+                
+                <!-- Error Message -->
+                <div th:if="${errorMessage}" class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                    <span th:text="${errorMessage}"></span>
+                </div>
+                <form th:action="@{/contact}" method="post">
+                    <div class="mb-6">
+                        <label for="name" class="block text-gray-700 font-semibold mb-2">Full Name</label>
+                        <input type="text" id="name" name="name" th:value="${userName}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" placeholder="John Doe" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="email" class="block text-gray-700 font-semibold mb-2">Email Address</label>
+                        <input type="email" id="email" name="email" th:value="${userEmail}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" placeholder="john@example.com" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="subject" class="block text-gray-700 font-semibold mb-2">Subject</label>
+                        <input type="text" id="subject" name="subject" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" placeholder="How can we help you?" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="message" class="block text-gray-700 font-semibold mb-2">Message</label>
+                        <textarea id="message" name="message" rows="6" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500" placeholder="Your message here..." required></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition duration-300">Send Message</button>
+                </form>
+            </div>
+
+            <!-- Contact Information -->
+            <div>
+                <div class="bg-white p-8 rounded-lg shadow-md mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Get in Touch</h2>
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-map-marker-alt text-purple-600 text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Visit Us</h3>
+                                <p class="text-gray-600">123 Homewood Avenue<br>Comfort City, SC 12345<br>United States</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-phone-alt text-purple-600 text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Call Us</h3>
+                                <p class="text-gray-600">+1 (555) 123-4567<br>Mon-Fri: 9:00 AM - 6:00 PM</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-envelope text-purple-600 text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Email Us</h3>
+                                <p class="text-gray-600">info@tabonfurniture.com<br>support@tabonfurniture.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Media Links -->
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Follow Us</h2>
+                    <div class="flex space-x-4">
+                        <a href="#" class="bg-purple-600 text-white p-3 rounded-full hover:bg-purple-700 transition duration-300">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="bg-purple-600 text-white p-3 rounded-full hover:bg-purple-700 transition duration-300">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="bg-purple-600 text-white p-3 rounded-full hover:bg-purple-700 transition duration-300">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="bg-purple-600 text-white p-3 rounded-full hover:bg-purple-700 transition duration-300">
+                            <i class="fab fa-pinterest"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <div class="mt-12">
+            <div class="bg-gray-200 h-96 rounded-lg">
+                <!-- Replace this div with an actual map integration -->
+                <div class="w-full h-full flex items-center justify-center text-gray-500">
+                    <p>Map integration goes here</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+            <div class="space-y-4">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">What are your shipping times?</h3>
+                    <p class="text-gray-600">We process orders within 1-2 business days. Standard shipping takes 3-5 business days, while express shipping takes 1-2 business days.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">What is your return policy?</h3>
+                    <p class="text-gray-600">We offer a 30-day return policy for all unused items in their original packaging. Returns are free for orders over $50.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Do you ship internationally?</h3>
+                    <p class="text-gray-600">Yes, we ship to most countries worldwide. International shipping times vary by location.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{nav/footer :: footer}"></div>
+</body>
+</html> 

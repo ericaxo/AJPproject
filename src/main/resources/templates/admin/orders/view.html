@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - Tab on Furniture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <div th:replace="~{nav/adminSidebar :: adminSidebar}"></div>
+        <main class="flex-1 overflow-x-hidden overflow-y-auto">
+            <div th:replace="~{nav/adminNavbar :: adminNavbar}"></div>
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Order Details</h1>
+                        <p class="text-gray-600">View and manage order information</p>
+                    </div>
+                    <a href="/admin/orders" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Orders
+                    </a>
+                </div>
+                <div th:if="${successMessage}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span th:text="${successMessage}"></span>
+                </div>
+                <div th:if="${errorMessage}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <span th:text="${errorMessage}"></span>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <!-- Order Status Summary -->
+                    <div class="flex items-center justify-between mb-6 p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-4">
+                            <div class="text-center">
+                                <span class="text-sm text-gray-600">Order Status</span>
+                                <div class="mt-1">
+                                    <span class="px-3 py-1 text-sm font-semibold rounded-full"
+                                          th:classappend="${order.status.name() == 'PENDING' ? 'text-yellow-800 bg-yellow-100' : 
+                                                          order.status.name() == 'SHIPPED' ? 'text-blue-800 bg-blue-100' : 
+                                                          order.status.name() == 'DELIVERED' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100'}"
+                                          th:text="${order.status}">PENDING</span>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <span class="text-sm text-gray-600">Payment Status</span>
+                                <div class="mt-1">
+                                    <span class="px-3 py-1 text-sm font-semibold rounded-full"
+                                          th:classappend="${order.paymentStatus.name() == 'PENDING' ? 'text-yellow-800 bg-yellow-100' : 
+                                                          order.paymentStatus.name() == 'PAID' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100'}"
+                                          th:text="${order.paymentStatus}">PENDING</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-sm text-gray-600">Total Amount</span>
+                            <div class="text-2xl font-bold text-green-600" th:text="'Rs ' + ${order.totalAmount}">Rs 0.00</div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">
+                        <i class="fas fa-info-circle mr-2 text-blue-600"></i>Order Information
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Order ID</label>
+                            <p class="text-lg font-semibold text-gray-900" th:text="${order.id}">Order ID</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">User</label>
+                            <p class="text-gray-900" th:text="${order.user != null ? order.user.username : 'Guest'}">User</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Order Date</label>
+                            <p class="text-gray-900" th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy HH:mm')}">Date</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Total Amount</label>
+                            <p class="text-xl font-bold text-green-600" th:text="'Rs ' + ${order.totalAmount}">Rs 0.00</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Order Status</label>
+                            <div class="flex items-center space-x-3">
+                                <span class="px-3 py-1 text-sm font-semibold rounded-full"
+                                      th:classappend="${order.status.name() == 'PENDING' ? 'text-yellow-800 bg-yellow-100' : 
+                                                      order.status.name() == 'SHIPPED' ? 'text-blue-800 bg-blue-100' : 
+                                                      order.status.name() == 'DELIVERED' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100'}"
+                                      th:text="${order.status}">PENDING</span>
+                                <form th:action="@{/admin/orders/{id}/update-status(id=${order.id})}" method="post" class="flex items-center space-x-2">
+                                    <select name="status" class="border rounded px-2 py-1 text-sm">
+                                        <option th:each="status : ${T(com.tabonfurniture.entity.Order.OrderStatus).values()}"
+                                                th:value="${status}" th:text="${status}" th:selected="${order.status.name() == status.name()}"></option>
+                                    </select>
+                                    <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">
+                                        <i class="fas fa-save mr-1"></i>Update
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
+                            <div class="flex items-center space-x-3">
+                                <span class="px-3 py-1 text-sm font-semibold rounded-full"
+                                      th:classappend="${order.paymentStatus.name() == 'PENDING' ? 'text-yellow-800 bg-yellow-100' : 
+                                                      order.paymentStatus.name() == 'PAID' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100'}"
+                                      th:text="${order.paymentStatus}">PENDING</span>
+                                <form th:action="@{/admin/orders/{id}/update-payment(id=${order.id})}" method="post" class="flex items-center space-x-2">
+                                    <select name="paymentStatus" class="border rounded px-2 py-1 text-sm">
+                                        <option th:each="ps : ${T(com.tabonfurniture.entity.Order.PaymentStatus).values()}"
+                                                th:value="${ps}" th:text="${ps}" th:selected="${order.paymentStatus.name() == ps.name()}"></option>
+                                    </select>
+                                    <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
+                                        <i class="fas fa-save mr-1"></i>Update
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8">
+                        <h4 class="text-lg font-semibold mb-2">Order Items</h4>
+                        <table class="w-full border rounded">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left">Product</th>
+                                    <th class="px-4 py-2 text-left">Quantity</th>
+                                    <th class="px-4 py-2 text-left">Price</th>
+                                    <th class="px-4 py-2 text-left">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${order.orderItems}">
+                                    <td th:text="${item.product != null ? item.product.name : 'N/A'}">Product</td>
+                                    <td th:text="${item.quantity}">1</td>
+                                    <td th:text="'Rs ' + ${item.unitPrice}">Rs 0.00</td>
+                                    <td th:text="'Rs ' + ${item.unitPrice.multiply(item.quantity)}">Rs 0.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html> 

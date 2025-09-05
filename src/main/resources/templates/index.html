@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Tab on Furniture - Your Home Destination</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+	<style>
+		.dropdown-menu {
+			display: none;
+			opacity: 0;
+			visibility: hidden;
+			transition: all 0.3s ease;
+		}
+
+		.user-dropdown:hover .dropdown-menu {
+			display: block;
+			opacity: 1;
+			visibility: visible;
+		}
+
+		.dropdown-menu::before {
+			content: '';
+			position: absolute;
+			top: -10px;
+			right: 10px;
+			width: 100%;
+			height: 10px;
+			background: transparent;
+		}
+	</style>
+</head>
+
+<body class="bg-gray-50">
+	
+	<div th:replace="~{nav/navbar :: navbar}"></div>
+
+	<!-- Hero Section -->
+	<div class="pt-16">
+		<div class="relative h-[500px] overflow-hidden">
+			<img src="https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?w=1600&h=900&fit=crop" alt="Furniture Banner" class="w-full h-full object-cover">
+			<div class="absolute inset-0 bg-black bg-opacity-40"></div>
+			<div class="absolute inset-0 flex items-center justify-center">
+				<div class="text-center text-white">
+					<h1 class="text-4xl font-bold mb-4">Welcome to Tab on Furniture</h1>
+					<p class="text-xl mb-8">Discover beautiful furniture and home decor</p>
+					<a href="/shop" class="bg-purple-600 text-white px-8 py-3 rounded-full hover:bg-purple-700">Shop
+						Now</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Featured Products -->
+	<div class="max-w-7xl mx-auto px-4 py-12">
+		<div class="mb-8">
+			<h2 class="text-2xl font-bold text-gray-900">Featured Products</h2>
+		</div>
+
+		<!-- Product Grid -->
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="productsContainer">
+			<!-- Product cards will be populated from backend -->
+			<div th:each="product : ${featuredProducts}" class="bg-white rounded-lg shadow-md overflow-hidden">
+				<a th:href="@{/products/{id}(id=${product.id})}">
+					<img th:if="${product.imageUrl != null and !product.imageUrl.isEmpty()}"
+						 th:src="${product.imageUrl}" th:alt="${product.name}" class="w-full h-64 object-cover"
+						 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+					<div class="hidden items-center justify-center h-64 bg-gray-100 text-gray-400 text-center">
+						<i class="fas fa-image fa-3x mb-2"></i>
+						<div>No Image Available</div>
+					</div>
+					<img th:if="${product.imageUrl == null or product.imageUrl.isEmpty()}"
+						 src="/images/placeholders/placeholder-400x400.jpg"
+						 class="w-full h-64 object-cover" th:alt="${product.name}">
+				</a>
+				<div class="p-4">
+					<a th:href="@{/products/{id}(id=${product.id})}">
+						<h3 class="text-lg font-semibold text-gray-900 hover:text-purple-600" th:text="${product.name}">Product Name</h3>
+					</a>
+					
+					<p class="text-gray-600 mt-2 text-lg font-semibold" th:text="'Rs ' + ${product.price}">Rs 29.99</p>
+					
+					<!-- Add to Cart Form -->
+					<form th:action="@{/cart/add-ajax}" method="post" class="mt-4">
+						<input type="hidden" name="productId" th:value="${product.id}">
+						<input type="hidden" name="quantity" value="1">
+						<button type="submit" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors">
+							<i class="fas fa-cart-plus mr-2"></i>Add to Cart
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="~{nav/footer :: footer}"></div>
+
+	<!-- Cart Notification -->
+	<div id="cartNotification" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+		<div class="flex items-center">
+			<i class="fas fa-check-circle mr-2"></i>
+			<span id="cartNotificationText">Product added to cart!</span>
+		</div>
+	</div>
+
+	<script>
+		// Cart notification functionality
+		function showCartNotification(message) {
+			const notification = document.getElementById('cartNotification');
+			const notificationText = document.getElementById('cartNotificationText');
+			
+			notificationText.textContent = message;
+			notification.classList.remove('translate-x-full');
+			
+			setTimeout(() => {
+				notification.classList.add('translate-x-full');
+			}, 3000);
+		}
+
+		// Handle cart form submission
+		document.addEventListener('DOMContentLoaded', function() {
+			const cartForms = document.querySelectorAll('form[method="post"]');
+			
+			cartForms.forEach(form => {
+				// Only handle forms that have productId input (cart forms)
+				const productIdInput = form.querySelector('input[name="productId"]');
+				if (!productIdInput) return;
+				
+				form.addEventListener('submit', function(e) {
+					e.preventDefault();
+					
+					// Check if user is logged in by looking for user info in navbar
+					const userInfo = document.querySelector('.user-dropdown');
+					if (!userInfo) {
+						// User is not logged in, show login prompt
+						showCartNotification('Please login to add items to cart!');
+						setTimeout(() => {
+							window.location.href = '/auth/login';
+						}, 1500);
+						return;
+					}
+					
+					const formData = new FormData(this);
+					const productId = formData.get('productId');
+					const quantity = formData.get('quantity');
+					
+					fetch('/cart/add-ajax', {
+						method: 'POST',
+						body: formData
+					})
+					.then(response => response.json())
+					.then(data => {
+						if (data.success) {
+							// Successfully added to cart, redirect to cart page
+							window.location.href = data.redirectUrl;
+						} else {
+							// Show error message
+							showCartNotification(data.message);
+							// If login required, redirect after showing message
+							if (data.redirectUrl) {
+								setTimeout(() => {
+									window.location.href = data.redirectUrl;
+								}, 1500);
+							}
+						}
+					})
+					.catch(error => {
+						console.error('Error:', error);
+						showCartNotification('Error adding product to cart!');
+					});
+				});
+			});
+		});
+	</script>
+</body>
+
+</html>

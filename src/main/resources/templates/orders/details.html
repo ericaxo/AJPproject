@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - Tab on Furniture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <div th:replace="~{nav/navbar :: navbar}"></div>
+
+    <!-- Order Details Section -->
+    <div class="pt-20 max-w-7xl mx-auto px-4 py-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="/orders" class="text-gray-700 hover:text-purple-600">My Orders</a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <span class="text-gray-500">Order #<span th:text="${order.id}">12345</span></span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Order Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 flex items-center">
+                        <i class="fas fa-receipt mr-3 text-purple-600"></i>Order #<span th:text="${order.id}">12345</span>
+                    </h1>
+                    <p class="text-gray-600 mt-2">
+                        Placed on <span th:text="${#temporals.format(order.orderDate, 'MMMM dd, yyyy HH:mm')}">January 15, 2025 10:30</span>
+                    </p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full"
+                          th:classappend="${order.status.name() == 'PENDING' ? 'bg-yellow-100 text-yellow-800' : 
+                                          order.status.name() == 'SHIPPED' ? 'bg-blue-100 text-blue-800' : 
+                                          order.status.name() == 'DELIVERED' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"
+                          th:text="${order.status}">PENDING</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Order Items -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i class="fas fa-box mr-2 text-purple-600"></i>Order Items (<span th:text="${order.totalItems}">2</span>)
+                        </h2>
+                    </div>
+                    <div class="p-6">
+                        <div th:each="item : ${order.orderItems}" class="flex items-start border-b border-gray-200 py-4 last:border-b-0">
+                            <div class="flex-shrink-0 mr-4">
+                                <img th:src="${item.product.imageUrl != null and !item.product.imageUrl.isEmpty() ? item.product.imageUrl : '/images/products/placeholder.jpg'}"
+                                     class="w-20 h-20 rounded-lg object-cover" alt="Product Image">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-semibold text-gray-900 text-lg" th:text="${item.product.name}">Product Name</h3>
+                                <p class="text-sm text-gray-600 mt-1" th:text="${item.product.description}">Product description</p>
+                                <div class="flex flex-wrap gap-2 mt-3">
+                                    <span class="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full" th:text="${item.product.category}">Category</span>
+                                    <span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full" th:text="${item.product.color}">Color</span>
+                                    <span class="inline-flex px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full" th:text="${item.product.dimensions}">Dimensions</span>
+                                </div>
+                            </div>
+                            <div class="text-right ml-4">
+                                <div class="font-semibold text-gray-900 text-lg">Rs <span th:text="${item.unitPrice}">29.99</span></div>
+                                <div class="text-sm text-gray-500 mt-1">×<span th:text="${item.quantity}">2</span></div>
+                                <div class="font-bold text-purple-600 text-lg mt-2">Rs <span th:text="${item.totalPrice}">59.98</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary Sidebar -->
+            <div class="space-y-6">
+                <!-- Order Summary Card -->
+                <div class="bg-white rounded-lg shadow-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i class="fas fa-calculator mr-2 text-purple-600"></i>Order Summary
+                        </h3>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Subtotal:</span>
+                            <span class="font-medium">Rs <span th:text="${order.totalAmount}">59.98</span></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Shipping:</span>
+                            <span class="text-green-600 font-medium">FREE</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Tax:</span>
+                            <span class="font-medium">Rs 0.00</span>
+                        </div>
+                        <hr class="my-3">
+                        <div class="flex justify-between text-lg font-bold">
+                            <span>Total:</span>
+                            <span class="text-purple-600">Rs <span th:text="${order.totalAmount}">59.98</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Information -->
+                <div class="bg-white rounded-lg shadow-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i class="fas fa-credit-card mr-2 text-purple-600"></i>Payment
+                        </h3>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <div>
+                            <span class="text-gray-600 text-sm">Payment Status:</span>
+                            <div class="mt-1">
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                                      th:classappend="${order.paymentStatus.name() == 'PENDING' ? 'bg-yellow-100 text-yellow-800' : 
+                                                      order.paymentStatus.name() == 'PAID' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"
+                                      th:text="${order.paymentStatus}">PENDING</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-gray-600 text-sm">Payment Method:</span>
+                            <div class="mt-1 text-sm text-gray-500">Credit Card ending in ****3456</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Information -->
+                <div class="bg-white rounded-lg shadow-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i class="fas fa-shipping-fast mr-2 text-purple-600"></i>Shipping
+                        </h3>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <div>
+                            <span class="text-gray-600 text-sm">Shipping Address:</span>
+                            <div class="mt-1 text-sm text-gray-900">
+                                <span th:text="${order.shippingAddress}">123 Main Street, City, State 12345</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-gray-600 text-sm">Shipping Method:</span>
+                            <div class="mt-1 text-sm text-gray-500">Standard Shipping (5-7 business days)</div>
+                        </div>
+                        <div th:if="${order.status.name() == 'SHIPPED' or order.status.name() == 'DELIVERED'}">
+                            <span class="text-gray-600 text-sm">Tracking Number:</span>
+                            <div class="mt-1">
+                                <code class="bg-gray-100 px-2 py-1 rounded text-sm">TF<span th:text="${order.id}">12345</span>2025</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Timeline -->
+        <div class="mt-8">
+            <div class="bg-white rounded-lg shadow-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-history mr-2 text-purple-600"></i>Order Timeline
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-6">
+                        <!-- Order Placed -->
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <h4 class="text-sm font-semibold text-gray-900">Order Placed</h4>
+                                <p class="text-sm text-gray-600 mt-1">Your order has been successfully placed.</p>
+                                <p class="text-xs text-gray-500 mt-1" th:text="${#temporals.format(order.orderDate, 'MMMM dd, yyyy HH:mm')}">January 15, 2025 10:30</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Confirmed -->
+                        <div class="flex items-start" th:if="${order.paymentStatus.name() == 'PAID'}">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-credit-card text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <h4 class="text-sm font-semibold text-gray-900">Payment Confirmed</h4>
+                                <p class="text-sm text-gray-600 mt-1">Payment has been successfully processed.</p>
+                                <p class="text-xs text-gray-500 mt-1">Payment confirmed</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Order Shipped -->
+                        <div class="flex items-start" th:if="${order.status.name() == 'SHIPPED' or order.status.name() == 'DELIVERED'}">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-shipping-fast text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <h4 class="text-sm font-semibold text-gray-900">Order Shipped</h4>
+                                <p class="text-sm text-gray-600 mt-1">Your order has been shipped and is on its way.</p>
+                                <p class="text-xs text-gray-500 mt-1">Shipped</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Order Delivered -->
+                        <div class="flex items-start" th:if="${order.status.name() == 'DELIVERED'}">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-home text-white text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <h4 class="text-sm font-semibold text-gray-900">Order Delivered</h4>
+                                <p class="text-sm text-gray-600 mt-1">Your order has been successfully delivered.</p>
+                                <p class="text-xs text-gray-500 mt-1">Delivered</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-8 flex flex-wrap gap-3">
+            <a href="/orders" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Orders
+            </a>
+            <button onclick="window.print()" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                <i class="fas fa-print mr-2"></i>Print Order
+            </button>
+            <a href="/products" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors">
+                <i class="fas fa-shopping-bag mr-2"></i>Continue Shopping
+            </a>
+            <!-- Cancel Order Button - Commented out as requested -->
+            <!--
+            <form th:if="${order.status.name() == 'PENDING'}" th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" class="inline">
+                <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors" onclick="return confirm('Are you sure you want to cancel this order?');">
+                    <i class="fas fa-times mr-2"></i>Cancel Order
+                </button>
+            </form>
+            -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{nav/footer :: footer}"></div>
+</body>
+</html>
+

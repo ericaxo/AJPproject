@@ -1,0 +1,438 @@
+/* auth-login.css - Replicates Tailwind CSS for auth/login.html */
+
+/* Base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+}
+
+/* Background colors */
+.bg-gradient-to-br {
+    background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+}
+
+.from-gray-100 {
+    --tw-gradient-from: #f3f4f6;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(243, 244, 246, 0));
+}
+
+.to-gray-200 {
+    --tw-gradient-to: #e5e7eb;
+}
+
+.bg-white {
+    background-color: #ffffff;
+}
+
+.bg-gray-100 {
+    background-color: #f3f4f6;
+}
+
+.bg-purple-600 {
+    background-color: #9333ea;
+}
+
+.bg-purple-700 {
+    background-color: #7c3aed;
+}
+
+.bg-green-100 {
+    background-color: #dcfce7;
+}
+
+.bg-red-100 {
+    background-color: #fee2e2;
+}
+
+/* Text colors */
+.text-white {
+    color: #ffffff;
+}
+
+.text-gray-900 {
+    color: #111827;
+}
+
+.text-gray-600 {
+    color: #4b5563;
+}
+
+.text-purple-600 {
+    color: #9333ea;
+}
+
+.text-green-600 {
+    color: #059669;
+}
+
+.text-green-700 {
+    color: #047857;
+}
+
+.text-red-600 {
+    color: #dc2626;
+}
+
+.text-red-700 {
+    color: #b91c1c;
+}
+
+/* Typography */
+.text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+/* Spacing */
+.pt-16 {
+    padding-top: 4rem;
+}
+
+.px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.px-8 {
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.py-2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.py-3 {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.py-4 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.py-24 {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+}
+
+.p-8 {
+    padding: 2rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.mb-6 {
+    margin-bottom: 1.5rem;
+}
+
+.mb-8 {
+    margin-bottom: 2rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.mr-2 {
+    margin-right: 0.5rem;
+}
+
+.me-2 {
+    margin-right: 0.5rem;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.mt-6 {
+    margin-top: 1.5rem;
+}
+
+.mt-8 {
+    margin-top: 2rem;
+}
+
+/* Layout */
+.max-w-md {
+    max-width: 28rem;
+}
+
+.max-w-2xl {
+    max-width: 42rem;
+}
+
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Sizing */
+.w-full {
+    width: 100%;
+}
+
+.w-1\/2 {
+    width: 50%;
+}
+
+.min-h-screen {
+    min-height: 100vh;
+}
+
+/* Border */
+.border {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #d1d5db;
+}
+
+.border-gray-200 {
+    border-color: #e5e7eb;
+}
+
+.border-green-400 {
+    border-color: #4ade80;
+}
+
+.border-red-400 {
+    border-color: #f87171;
+}
+
+.border-purple-500 {
+    border-color: #a855f7;
+}
+
+.rounded {
+    border-radius: 0.25rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+.rounded-xl {
+    border-radius: 0.75rem;
+}
+
+.rounded-full {
+    border-radius: 9999px;
+}
+
+/* Focus states */
+.focus\:outline-none:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}
+
+.focus\:border-purple-500:focus {
+    border-color: #a855f7;
+}
+
+.focus\:ring-2:focus {
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.5);
+}
+
+.focus\:ring-purple-500:focus {
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.5);
+}
+
+/* Shadow */
+.shadow-2xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Overflow */
+.overflow-hidden {
+    overflow: hidden;
+}
+
+/* Hover effects */
+.hover\:bg-purple-700:hover {
+    background-color: #7c3aed;
+}
+
+.hover\:text-purple-600:hover {
+    color: #9333ea;
+}
+
+.hover\:bg-gray-50:hover {
+    background-color: #f9fafb;
+}
+
+/* Transition */
+.transition-colors {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+/* Form elements */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    background-color: #ffffff;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    border-color: #a855f7;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.5);
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: #9333ea;
+    color: #ffffff;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #7c3aed;
+}
+
+/* Alert styles */
+.relative {
+    position: relative;
+}
+
+.role-alert {
+    /* For accessibility */
+}
+
+/* Tab styles */
+#loginTab, #signupTab {
+    width: 50%;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    font-weight: 600;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+#loginTab {
+    color: #9333ea;
+    background-color: #f3f4f6;
+}
+
+#signupTab {
+    color: #4b5563;
+}
+
+#loginTab.active {
+    color: #9333ea;
+    background-color: #f3f4f6;
+}
+
+#signupTab.active {
+    color: #4b5563;
+}
+
+/* Form visibility */
+#loginForm, #signupForm {
+    display: none;
+}
+
+#loginForm.active, #signupForm.active {
+    display: block;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+    .max-w-md {
+        max-width: 100%;
+        margin: 0 1rem;
+    }
+    
+    .py-24 {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+} 

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - Tab on Furniture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .dropdown-menu {
+            display: none;
+            transition: all 0.3s ease;
+        }
+        .user-dropdown:hover .dropdown-menu {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    
+	<div th:replace="~{nav/navbar :: navbar}"></div>
+
+    <!-- Shop Section -->
+    <div class="pt-20 max-w-7xl mx-auto px-4">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Filters Sidebar -->
+            <form method="get" action="/products" class="w-full md:w-1/4" onsubmit="return validateForm()">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold mb-4">Filters</h2>
+                    
+                    <!-- Category Filter -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-2">Categories</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center" th:each="cat : ${categories}">
+                                <input type="checkbox" class="form-checkbox text-purple-600" name="category"
+                                    th:value="${cat}" th:checked="${cat == selectedCategory}">
+                                <span class="ml-2" th:text="${cat}">Category</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Price Range -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-2">Price Range</h3>
+                        <div class="flex gap-2">
+                            <input type="number" name="minPrice" class="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Min" th:value="${minPrice}" step="0.01" min="0" oninput="validatePrice(this, 'min')">
+                            <input type="number" name="maxPrice" class="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Max" th:value="${maxPrice}" step="0.01" min="0" oninput="validatePrice(this, 'max')">
+                        </div>
+                        <div id="priceError" class="text-red-500 text-sm mt-1 hidden">Price cannot be negative</div>
+                    </div>
+
+                    <!-- Color / Finish -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-2">Color / Finish</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <label th:each="col : ${colors}" class="cursor-pointer">
+                                <input type="radio" name="color" th:value="${col}" th:checked="${col == selectedColor}" class="hidden peer">
+                                <div class="w-6 h-6 rounded-full border-2 border-white peer-checked:ring-2 peer-checked:ring-purple-500" th:style="'background-color:' + ${col}"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    
+
+                    <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">Apply Filters</button>
+                    <a href="/products" class="w-full block text-center mt-2 text-purple-600 hover:underline">Clear Filters</a>
+                </div>
+            </form>
+
+            <!-- Main Content Area -->
+            <div class="w-full md:w-3/4">
+                <!-- Search Bar -->
+                <div class="mb-6">
+                    <form method="get" action="/products" class="flex gap-2">
+                        <div class="relative flex-1">
+                            <input type="text" name="search" placeholder="Search products..." 
+                                   th:value="${search}" 
+                                   class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <button type="submit" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+                            Search
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Recommended for You -->
+                <div th:if="${recommendedProducts != null and #lists.size(recommendedProducts) > 0 and (search == null or search.isEmpty())}" class="mb-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-2xl font-bold text-purple-700">Recommended for You</h2>
+                        <div class="flex items-center space-x-2">
+                            <span th:if="${user != null}" class="inline-flex items-center px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
+                                <i class="fas fa-user-check mr-1"></i>Personalized
+                            </span>
+                            <span th:if="${user == null}" class="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                                <i class="fas fa-random mr-1"></i>Discover
+                            </span>
+                            <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                                <i class="fas fa-clock mr-1"></i>Updated
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-6 overflow-x-auto pb-2" style="scrollbar-width: thin;">
+                        <div th:each="prod,iter : ${recommendedProducts}" th:if="${iter.index} < 4" class="bg-white rounded-lg shadow-md p-4 flex flex-col items-center min-w-[220px] max-w-[220px] w-[220px]">
+                            <img th:if="${prod.imageUrl != null and !#strings.isEmpty(prod.imageUrl)}"
+                                 th:src="${prod.imageUrl}"
+                                 alt=""
+                                 class="w-32 h-32 object-cover rounded mb-3"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="hidden items-center justify-center w-32 h-32 bg-gray-100 text-gray-400 rounded mb-3">
+                                <i class="fas fa-image fa-lg mr-2"></i>
+                                <span>No Image</span>
+                            </div>
+                            <h3 class="text-lg font-semibold mb-1 text-center" th:text="${prod.name}">Product Name</h3>
+                            <p class="text-gray-500 mb-2 text-center" th:text="${prod.category}">Category</p>
+                            <p class="text-purple-600 font-bold text-xl mb-2" th:text="${'Rs ' + #numbers.formatDecimal(prod.price, 1, 2)}">Rs 0.00</p>
+                            <a th:href="@{'/products/' + ${prod.id}}" class="mt-auto bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">View</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Product Grid -->
+                <div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" th:if="${not #lists.isEmpty(products)}">
+                    <div th:each="product : ${products}" class="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
+                        <a th:href="@{/products/{id}(id=${product.id})}">
+                            <img th:if="${product.imageUrl != null and !product.imageUrl.isEmpty()}"
+                                 th:src="${product.imageUrl}" th:alt="${product.name}" class="w-full h-64 object-cover"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="hidden items-center justify-center h-64 bg-gray-100 text-gray-400 text-center">
+                                <i class="fas fa-image fa-3x mb-2"></i>
+                                <div>No Image Available</div>
+                            </div>
+                            <img th:if="${product.imageUrl == null or product.imageUrl.isEmpty()}"
+                                 src="/images/placeholders/placeholder-400x400.jpg"
+                                 class="w-full h-64 object-cover" th:alt="${product.name}">
+                        </a>
+                        <div class="p-4 flex flex-col flex-1">
+                            <a th:href="@{/products/{id}(id=${product.id})}">
+                                <h3 class="text-lg font-semibold text-gray-900 hover:text-purple-600" th:text="${product.name}">Product Name</h3>
+                            </a>
+                            
+                            <p class="text-gray-600 mt-2 text-lg font-semibold" th:text="'Rs ' + ${product.price}">Rs 29.99</p>
+                            <a th:href="@{/products/{id}(id=${product.id})}" class="mt-4">
+                                <button type="button"
+                                        class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
+                                    <i class="fas fa-eye mr-1"></i>
+                                    <span>View Details</span>
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No Products Found -->
+                <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No products found</h4>
+                    <p class="text-muted">Try adjusting your filters or search terms.</p>
+                    <a href="/products" class="btn btn-primary">View All Products</a>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-center mt-8" th:if="${productPage.totalPages > 1}">
+                    <nav class="flex items-center space-x-2">
+                        <!-- Previous -->
+                        <a th:href="@{/products(
+                                page=${productPage.number - 1},
+                                pageSize=${pageSize},
+                                sortBy=${sortBy},
+                                sortDir=${sortDir},
+                                category=${selectedCategory},
+                                color=${selectedColor},
+                                size=${selectedSize},
+                                minPrice=${minPrice},
+                                maxPrice=${maxPrice},
+                                
+                                search=${search})}"
+                           th:class="'px-3 py-2 rounded-lg border ' + (${productPage.first} ? 'text-gray-400 cursor-not-allowed pointer-events-none' : 'hover:bg-gray-100')">
+                            Previous
+                        </a>
+                        <!-- Page Numbers -->
+                        <a th:each="pageNum : ${#numbers.sequence(T(java.lang.Math).max(0, productPage.number - 2), T(java.lang.Math).min(productPage.totalPages - 1, productPage.number + 2))}"
+                           th:href="@{/products(
+                                page=${pageNum},
+                                pageSize=${pageSize},
+                                sortBy=${sortBy},
+                                sortDir=${sortDir},
+                                category=${selectedCategory},
+                                color=${selectedColor},
+                                size=${selectedSize},
+                                minPrice=${minPrice},
+                                maxPrice=${maxPrice},
+                                
+                                search=${search})}"
+                           th:class="'px-3 py-2 rounded-lg border ' + (${pageNum == productPage.number} ? 'bg-purple-600 text-white' : 'hover:bg-gray-100')"
+                           th:text="${pageNum + 1}">
+                        </a>
+                        <!-- Next -->
+                        <a th:href="@{/products(
+                                page=${productPage.number + 1},
+                                pageSize=${pageSize},
+                                sortBy=${sortBy},
+                                sortDir=${sortDir},
+                                category=${selectedCategory},
+                                color=${selectedColor},
+                                size=${selectedSize},
+                                minPrice=${minPrice},
+                                maxPrice=${maxPrice},
+                                
+                                search=${search})}"
+                           th:class="'px-3 py-2 rounded-lg border ' + (${productPage.last} ? 'text-gray-400 cursor-not-allowed pointer-events-none' : 'hover:bg-gray-100')">
+                            Next
+                        </a>
+                    </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Notification -->
+    <div id="cartNotification" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="cartNotificationText">Product added to cart!</span>
+        </div>
+    </div>
+
+	<div th:replace="~{nav/footer :: footer}"></div>
+
+    <script>
+        function changePageSize(pageSize) {
+            const url = new URL(window.location);
+            url.searchParams.set('pageSize', pageSize);
+            url.searchParams.set('page', '0');
+            window.location.href = url.toString();
+        }
+        
+        function changeSort(sortBy) {
+            const url = new URL(window.location);
+            url.searchParams.set('sortBy', sortBy);
+            url.searchParams.set('page', '0');
+            window.location.href = url.toString();
+        }
+        
+        function setView(view) {
+            // Toggle view icons
+            const gridView = document.getElementById('gridView');
+            const listView = document.getElementById('listView');
+            
+            if (view === 'grid') {
+                gridView.querySelector('i').className = 'fas fa-th text-purple-600';
+                listView.querySelector('i').className = 'fas fa-list text-gray-400';
+            } else {
+                gridView.querySelector('i').className = 'fas fa-th text-gray-400';
+                listView.querySelector('i').className = 'fas fa-list text-purple-600';
+            }
+            
+            // You can add logic here to change the product grid layout
+            // For now, we'll just toggle the icons
+        }
+        
+        // Cart notification functionality
+        function showCartNotification(message) {
+            const notification = document.getElementById('cartNotification');
+            const notificationText = document.getElementById('cartNotificationText');
+            
+            notificationText.textContent = message;
+            notification.classList.remove('translate-x-full');
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+            }, 3000);
+        }
+        
+        // Update cart count in navbar
+        function updateCartCount() {
+            fetch('/cart/count')
+                .then(response => response.json())
+                .then(data => {
+                    const cartBadge = document.querySelector('.fas.fa-shopping-cart').nextElementSibling;
+                    if (cartBadge && data.count > 0) {
+                        cartBadge.textContent = data.count;
+                        cartBadge.classList.remove('hidden');
+                    } else if (cartBadge && data.count === 0) {
+                        cartBadge.classList.add('hidden');
+                    }
+                })
+                .catch(error => console.error('Error updating cart count:', error));
+        }
+        
+        // Price validation function
+        function validatePrice(input, type) {
+            const value = parseFloat(input.value);
+            const errorDiv = document.getElementById('priceError');
+            
+            // Clear any non-numeric characters except decimal point
+            input.value = input.value.replace(/[^0-9.]/g, '');
+            
+            // Prevent negative values
+            if (value < 0 || input.value.startsWith('-')) {
+                input.value = '';
+                errorDiv.classList.remove('hidden');
+                setTimeout(() => {
+                    errorDiv.classList.add('hidden');
+                }, 3000);
+                return false;
+            }
+            
+            // Validate min/max relationship
+            const minInput = document.querySelector('input[name="minPrice"]');
+            const maxInput = document.querySelector('input[name="maxPrice"]');
+            
+            if (minInput && maxInput && minInput.value && maxInput.value) {
+                const minValue = parseFloat(minInput.value);
+                const maxValue = parseFloat(maxInput.value);
+                
+                if (minValue > maxValue) {
+                    if (type === 'min') {
+                        maxInput.value = minValue;
+                    } else {
+                        minInput.value = maxValue;
+                    }
+                }
+            }
+            
+            errorDiv.classList.add('hidden');
+            return true;
+        }
+        
+        // Prevent form submission with negative values
+        function validateForm() {
+            const minInput = document.querySelector('input[name="minPrice"]');
+            const maxInput = document.querySelector('input[name="maxPrice"]');
+            const errorDiv = document.getElementById('priceError');
+            
+            if (minInput && minInput.value && parseFloat(minInput.value) < 0) {
+                minInput.value = '';
+                errorDiv.classList.remove('hidden');
+                setTimeout(() => {
+                    errorDiv.classList.add('hidden');
+                }, 3000);
+                return false;
+            }
+            
+            if (maxInput && maxInput.value && parseFloat(maxInput.value) < 0) {
+                maxInput.value = '';
+                errorDiv.classList.remove('hidden');
+                setTimeout(() => {
+                    errorDiv.classList.add('hidden');
+                }, 3000);
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Handle cart form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add additional event listeners for price inputs
+            const minPriceInput = document.querySelector('input[name="minPrice"]');
+            const maxPriceInput = document.querySelector('input[name="maxPrice"]');
+            
+            if (minPriceInput) {
+                minPriceInput.addEventListener('keydown', function(e) {
+                    if (e.key === '-') {
+                        e.preventDefault();
+                    }
+                });
+                
+                minPriceInput.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                    const cleanValue = pastedText.replace(/[^0-9.]/g, '');
+                    if (cleanValue && parseFloat(cleanValue) >= 0) {
+                        this.value = cleanValue;
+                    }
+                });
+            }
+            
+            if (maxPriceInput) {
+                maxPriceInput.addEventListener('keydown', function(e) {
+                    if (e.key === '-') {
+                        e.preventDefault();
+                    }
+                });
+                
+                maxPriceInput.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                    const cleanValue = pastedText.replace(/[^0-9.]/g, '');
+                    if (cleanValue && parseFloat(cleanValue) >= 0) {
+                        this.value = cleanValue;
+                    }
+                });
+            }
+            const cartForm = document.querySelector('form[method="post"]');
+            
+            if (cartForm) {
+                cartForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Check if user is logged in by looking for user info in navbar
+                    const userInfo = document.querySelector('.user-dropdown');
+                    if (!userInfo) {
+                        // User is not logged in, show login prompt
+                        showCartNotification('Please login to add items to cart!');
+                        setTimeout(() => {
+                            window.location.href = '/auth/login';
+                        }, 1500);
+                        return;
+                    }
+                    
+                    const formData = new FormData(this);
+                    const productId = formData.get('productId');
+                    const quantity = formData.get('quantity');
+                    
+                    fetch('/cart/add-ajax', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Successfully added to cart, redirect to cart page
+                            window.location.href = data.redirectUrl;
+                        } else {
+                            // Show error message
+                            showCartNotification(data.message);
+                            // If login required, redirect after showing message
+                            if (data.redirectUrl) {
+                                setTimeout(() => {
+                                    window.location.href = data.redirectUrl;
+                                }, 1500);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showCartNotification('Error adding product to cart!');
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

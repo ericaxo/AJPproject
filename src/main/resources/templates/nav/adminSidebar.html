@@ -1,0 +1,58 @@
+<div th:fragment="adminSidebar">
+	<!-- Sidebar -->
+	<aside class="bg-gray-800 text-white w-64 min-h-screen px-4 py-8">
+		<div class="flex items-center justify-center mb-8">
+			<div class="flex items-center space-x-3">
+				<img src="/images/logo.png" alt="Tab on Furniture" class="h-10 w-10 rounded-full">
+				<span class="text-xl font-bold">Admin Panel</span>
+			</div>
+		</div>
+
+		<nav class="space-y-2">
+			<a href="/admin/dashboard" 
+			   th:class="'flex items-center space-x-2 p-2 rounded-lg ' + (${activePage != null and activePage == 'dashboard'} ? 'bg-gray-900 text-white' : 'hover:bg-gray-900')">
+				<i class="fas fa-tachometer-alt"></i>
+				<span>Dashboard</span>
+			</a>
+			<a href="/admin/products" 
+			   th:class="'flex items-center space-x-2 p-2 rounded-lg ' + (${activePage != null and activePage == 'products'} ? 'bg-gray-900 text-white' : 'hover:bg-gray-900')">
+				<i class="fas fa-box"></i>
+				<span>Products</span>
+			</a>
+			<a href="/admin/orders" 
+			   th:class="'flex items-center space-x-2 p-2 rounded-lg ' + (${activePage != null and activePage == 'orders'} ? 'bg-gray-900 text-white' : 'hover:bg-gray-900')">
+				<i class="fas fa-shopping-cart"></i>
+				<span>Orders</span>
+			</a>
+			<a href="/admin/users" 
+			   th:class="'flex items-center space-x-2 p-2 rounded-lg ' + (${activePage != null and activePage == 'users'} ? 'bg-gray-900 text-white' : 'hover:bg-gray-900')">
+				<i class="fas fa-users"></i>
+				<span>Users</span>
+			</a>
+			<a href="/admin/categories" 
+			   th:class="'flex items-center space-x-2 p-2 rounded-lg ' + (${activePage != null and activePage == 'categories'} ? 'bg-gray-900 text-white' : 'hover:bg-gray-900')">
+				<i class="fas fa-tags"></i>
+				<span>Categories</span>
+			</a>
+			<a href="/admin/contacts" 
+			   th:class="'flex items-center space-x-2 p-2 rounded-lg ' + (${activePage != null and activePage == 'contacts'} ? 'bg-gray-900 text-white' : 'hover:bg-gray-900')">
+				<i class="fas fa-envelope"></i>
+				<span>Contacts</span>
+			</a>
+			<a href="/auth/logout" onclick="handleLogout()"
+				class="flex items-center space-x-2 text-red-500 hover:text-red-400 p-2 rounded-lg">
+				<i class="fas fa-sign-out-alt"></i>
+				<span>Logout</span>
+			</a>
+		</nav>
+
+		<!-- Logout Button -->
+		<!-- <div class="absolute bottom-0 left-0 right-0 p-4">
+			<a href="/auth/logout" onclick="handleLogout()"
+				class="flex items-center space-x-2 text-red-500 hover:text-red-400 p-2 rounded-lg">
+				<i class="fas fa-sign-out-alt"></i>
+				<span>Logout</span>
+			</a>
+		</div> -->
+	</aside>
+</div>
