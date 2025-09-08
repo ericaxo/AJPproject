@@ -1,1 +1,230 @@
-<!DOCTYPE html><html lang="en" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Checkout - Tab On Furniture</title><script src="https://cdn.tailwindcss.com"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></head><body class="bg-gray-50"><div th:replace="~{nav/navbar :: navbar}"></div><div class="pt-16 pb-8"><div class="max-w-7xl mx-auto px-4"><h1 class="text-3xl font-bold text-gray-900 mb-8 flex items-center"><i class="fas fa-credit-card text-purple-600 mr-3"></i>Checkout</h1><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-2"><div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6"><form th:action="@{/orders/place}" method="post"><div class="mb-8"><h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center"><i class="fas fa-shipping-fast text-purple-600 mr-3"></i>Shipping Information</h2><div><label for="shippingAddress" class="block text-sm font-medium text-gray-700 mb-2">Shipping Address *</label><textarea class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" id="shippingAddress" name="shippingAddress" rows="4" required placeholder="Enter your complete shipping address"></textarea></div></div><div class="mb-8"><h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center"><i class="fas fa-credit-card text-purple-600 mr-3"></i>Payment Information</h2><div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg mb-6 flex items-center"><i class="fas fa-info-circle mr-2"></i>This is a demo application. No real payment will be processed.</div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label for="cardNumber" class="block text-sm font-medium text-gray-700 mb-2">Card Number</label><input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500" id="cardNumber" value="1234 5678 9012 3456" readonly></div><div><label for="cardName" class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label><input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500" id="cardName" value="John Doe" readonly></div><div><label for="expiryMonth" class="block text-sm font-medium text-gray-700 mb-2">Expiry Month</label><select class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500" id="expiryMonth" disabled><option selected>12</option></select></div><div><label for="expiryYear" class="block text-sm font-medium text-gray-700 mb-2">Expiry Year</label><select class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500" id="expiryYear" disabled><option selected>2025</option></select></div><div><label for="cvv" class="block text-sm font-medium text-gray-700 mb-2">CVV</label><input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500" id="cvv" value="123" readonly></div></div></div><div class="mb-6"><div class="flex items-start"><input type="checkbox" id="terms" required class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"><label for="terms" class="ml-2 text-sm text-gray-700">I agree to the <a href="#" class="text-purple-600 hover:text-purple-800 underline">Terms and Conditions</a> and <a href="#" class="text-purple-600 hover:text-purple-800 underline">Privacy Policy</a></label></div></div><div class="flex flex-col sm:flex-row justify-between gap-4"><a href="/cart" class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"><i class="fas fa-arrow-left mr-2"></i>Back to Cart</a><button type="submit" class="inline-flex items-center px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"><i class="fas fa-lock mr-2"></i>Place Order</button></div></form></div></div><div class="lg:col-span-1"><div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6"><h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center"><i class="fas fa-receipt text-purple-600 mr-3"></i>Order Summary</h2><div th:if="${cart != null and !cart.cartItems.empty}" class="space-y-4"><div th:each="item : ${cart.cartItems}" class="flex justify-between items-start py-3 border-b border-gray-200"><div class="flex-1"><div class="font-medium text-gray-900" th:text="${item.product.name}">Product Name</div><div class="text-sm text-gray-500">Qty: <span th:text="${item.quantity}">1</span> × $<span th:text="${#numbers.formatDecimal(item.unitPrice, 1, 2)}">0.00</span></div></div><div class="font-semibold text-gray-900">$<span th:text="${#numbers.formatDecimal(item.totalPrice, 1, 2)}">0.00</span></div></div></div><div th:if="${cart == null or cart.cartItems.empty}" class="text-center py-8"><i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i><p class="text-gray-500 mb-4">Your cart is empty</p><a href="/products" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">Continue Shopping</a></div><div th:if="${cart != null and !cart.cartItems.empty}" class="mt-6 space-y-3"><div class="flex justify-between text-sm"><span>Subtotal (<span th:text="${itemCount ?: 0}">0</span> items):</span><span>$<span th:text="${#numbers.formatDecimal(subtotal ?: 0, 1, 2)}">0.00</span></span></div><div class="flex justify-between text-sm"><span>Shipping:</span><span class="text-green-600 font-medium">FREE</span></div><div class="flex justify-between text-sm"><span>Tax (8%):</span><span>$<span th:text="${#numbers.formatDecimal(tax ?: 0, 1, 2)}">0.00</span></span></div><div class="border-t border-gray-200 pt-3"><div class="flex justify-between text-lg font-semibold"><span>Total:</span><span class="text-purple-600">$<span th:text="${#numbers.formatDecimal(total ?: 0, 1, 2)}">0.00</span></span></div></div><div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg"><div class="flex items-center text-green-800 text-sm"><i class="fas fa-leaf mr-2"></i>Eco-friendly items in cart: <span th:text="${cart.cartItems.size()}" class="font-medium ml-1">0</span></div></div></div></div></div></div></div></div><div th:replace="~{nav/footer :: footer}"></div></body></html>
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Aurora Decors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <div th:replace="~{nav/navbar :: navbar}"></div>
+    
+    <div class="pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4">
+            <h1 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                <i class="fas fa-credit-card text-purple-600 mr-3"></i>
+                Checkout
+            </h1>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column - Checkout Form -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <form th:action="@{/orders/place}" method="post">
+                            <!-- Shipping Information -->
+                            <div class="mb-8">
+                                <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                                    <i class="fas fa-shipping-fast text-purple-600 mr-3"></i>
+                                    Shipping Information
+                                </h2>
+                                <div>
+                                    <label for="shippingAddress" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Shipping Address *
+                                    </label>
+                                    <textarea 
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" 
+                                        id="shippingAddress" 
+                                        name="shippingAddress" 
+                                        rows="4" 
+                                        required 
+                                        placeholder="Enter your complete shipping address">
+                                    </textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- Payment Information -->
+                            <div class="mb-8">
+                                <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                                    <i class="fas fa-credit-card text-purple-600 mr-3"></i>
+                                    Payment Information
+                                </h2>
+                                
+                                <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg mb-6 flex items-center">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    This is a demo application. No real payment will be processed.
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="cardNumber" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Card Number
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" 
+                                            id="cardNumber" 
+                                            name="cardNumber"
+                                            placeholder="1234 5678 9012 3456"
+                                            required>
+                                    </div>
+                                    <div>
+                                        <label for="cardName" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Cardholder Name
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" 
+                                            id="cardName" 
+                                            name="cardName"
+                                            placeholder="John Doe"
+                                            required>
+                                    </div>
+                                    <div>
+                                        <label for="expiryMonth" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Expiry Month
+                                        </label>
+                                        <select 
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" 
+                                            id="expiryMonth" 
+                                            name="expiryMonth"
+                                            required>
+                                            <option value="">Select Month</option>
+                                            <option value="01">01</option>
+                                            <option value="02">02</option>
+                                            <option value="03">03</option>
+                                            <option value="04">04</option>
+                                            <option value="05">05</option>
+                                            <option value="06">06</option>
+                                            <option value="07">07</option>
+                                            <option value="08">08</option>
+                                            <option value="09">09</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="expiryYear" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Expiry Year
+                                        </label>
+                                        <select 
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" 
+                                            id="expiryYear" 
+                                            name="expiryYear"
+                                            required>
+                                            <option value="">Select Year</option>
+                                            <option value="2024">2024</option>
+                                            <option value="2025">2025</option>
+                                            <option value="2026">2026</option>
+                                            <option value="2027">2027</option>
+                                            <option value="2028">2028</option>
+                                            <option value="2029">2029</option>
+                                            <option value="2030">2030</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Terms and Conditions -->
+                            <div class="mb-6">
+                                <div class="flex items-start">
+                                    <input 
+                                        type="checkbox" 
+                                        id="terms" 
+                                        required 
+                                        class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                                    <label for="terms" class="ml-2 text-sm text-gray-700">
+                                        I agree to the 
+                                        <a href="#" class="text-purple-600 hover:text-purple-800 underline">Terms and Conditions</a> 
+                                        and 
+                                        <a href="#" class="text-purple-600 hover:text-purple-800 underline">Privacy Policy</a>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <a href="/cart" class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-arrow-left mr-2"></i>
+                                    Back to Cart
+                                </a>
+                                <button type="submit" class="inline-flex items-center px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
+                                    <i class="fas fa-lock mr-2"></i>
+                                    Place Order
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Right Column - Order Summary -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                            <i class="fas fa-receipt text-purple-600 mr-3"></i>
+                            Order Summary
+                        </h2>
+                        
+                        <!-- Cart Items -->
+                        <div th:if="${cart != null and !cart.cartItems.empty}" class="space-y-4">
+                            <div th:each="item : ${cart.cartItems}" class="flex justify-between items-start py-3 border-b border-gray-200">
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-900" th:text="${item.product.name}">
+                                        Product Name
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        Qty: <span th:text="${item.quantity}">1</span> × rs.<span th:text="${#numbers.formatDecimal(item.unitPrice, 1, 2)}">0.00</span>
+                                    </div>
+                                </div>
+                                <div class="font-semibold text-gray-900">
+                                    Rs.<span th:text="${#numbers.formatDecimal(item.totalPrice, 1, 2)}">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Empty Cart -->
+                        <div th:if="${cart == null or cart.cartItems.empty}" class="text-center py-8">
+                            <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500 mb-4">Your cart is empty</p>
+                            <a href="/products" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                Continue Shopping
+                            </a>
+                        </div>
+                        
+                        <!-- Order Total -->
+                        <div th:if="${cart != null and !cart.cartItems.empty}" class="mt-6 space-y-3">
+                            <div class="flex justify-between text-sm">
+                                <span>Subtotal (<span th:text="${itemCount ?: 0}">0</span> items):</span>
+                                <span>Rs.<span th:text="${#numbers.formatDecimal(subtotal ?: 0, 1, 2)}">0.00</span></span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span>Shipping:</span>
+                                <span class="text-green-600 font-medium">FREE</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span>Tax (8%):</span>
+                                <span>Rs.<span th:text="${#numbers.formatDecimal(tax ?: 0, 1, 2)}">0.00</span></span>
+                            </div>
+                            <div class="border-t border-gray-200 pt-3">
+                                <div class="flex justify-between text-lg font-semibold">
+                                    <span>Total:</span>
+                                    <span class="text-purple-600">Rs.<span th:text="${#numbers.formatDecimal(total ?: 0, 1, 2)}">0.00</span></span>
+                                </div>
+                            </div>
+                            <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                <div class="flex items-center text-green-800 text-sm">
+                                    <i class="fas fa-leaf mr-2"></i>
+                                    Eco-friendly items in cart: <span th:text="${cart.cartItems.size()}" class="font-medium ml-1">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{nav/footer :: footer}"></div>
+</body>
+</html>

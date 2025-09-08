@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Details - Tab on Furniture</title>
+    <title>Order Details - AuroraDecors</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -90,7 +90,7 @@
                                       th:text="${order.status}">PENDING</span>
                                 <form th:action="@{/admin/orders/{id}/update-status(id=${order.id})}" method="post" class="flex items-center space-x-2">
                                     <select name="status" class="border rounded px-2 py-1 text-sm">
-                                        <option th:each="status : ${T(com.tabonfurniture.entity.Order.OrderStatus).values()}"
+                                        <option th:each="status : ${T(com.AuroraDecors.entity.Order.OrderStatus).values()}"
                                                 th:value="${status}" th:text="${status}" th:selected="${order.status.name() == status.name()}"></option>
                                     </select>
                                     <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">
@@ -108,7 +108,7 @@
                                       th:text="${order.paymentStatus}">PENDING</span>
                                 <form th:action="@{/admin/orders/{id}/update-payment(id=${order.id})}" method="post" class="flex items-center space-x-2">
                                     <select name="paymentStatus" class="border rounded px-2 py-1 text-sm">
-                                        <option th:each="ps : ${T(com.tabonfurniture.entity.Order.PaymentStatus).values()}"
+                                        <option th:each="ps : ${T(com.AuroraDecors.entity.Order.PaymentStatus).values()}"
                                                 th:value="${ps}" th:text="${ps}" th:selected="${order.paymentStatus.name() == ps.name()}"></option>
                                     </select>
                                     <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
